@@ -8,17 +8,22 @@ import (
 )
 
 // 定义全局变量, 用来保存配置信息
-var Conf = new(AppConfig)
+var Conf = new(Config)
+
+type Config struct {
+	*AppConfig `mapstructure:"app"`
+	*LogConfig `mapstructure:"log"`
+	*MySQLConfig `mapstructure:"mysql"`
+	*RedisConfig `mapstructure:"redis"`
+}
 
 type AppConfig struct {
 	Name string `mapstructure:"name"`
 	Mode string `mapstructure:"mode"`
-	Version string `mapstructure:"version"`
 	Port int `mapstructure:"port"`
-
-	*LogConfig `mapstructure:"log"`
-	*MySQLConfig `mapstructure:"mysql"`
-	*RedisConfig `mapstructure:"redis"`
+	Version string `mapstructure:"version"`
+	StartTime string `mapstructure:"start_time"`
+	MachineID int64 `mapstructure:"machine_id"`
 }
 
 type LogConfig struct {
@@ -48,9 +53,9 @@ type RedisConfig struct {
 }
 
 func Init() error {
-	viper.SetConfigName("../config")
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./conf")
+	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Printf("viper.readinconfig() error:%v\n", err)

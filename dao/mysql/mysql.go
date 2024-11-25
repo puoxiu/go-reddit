@@ -21,7 +21,8 @@ func InitDB(cfg *settings.MySQLConfig) error {
 		cfg.DbName,
 	)
 
-	db, err := sqlx.Connect("mysql", dsn)
+	var err error
+	db, err = sqlx.Connect("mysql", dsn)
 	if err != nil {
 		zap.L().Error("connect mysql failed", zap.Error(err))
 		return err
@@ -31,10 +32,20 @@ func InitDB(cfg *settings.MySQLConfig) error {
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 	db.SetMaxIdleConns(cfg.MaxIdleConns)
 
+
+
 	return nil
 }
 
 func Close() {
 	// 关闭数据库
     _ = db.Close()
+}
+
+func Judge() {
+	if db == nil {
+		fmt.Println("db is nil in u1111212213123123")
+	} else {
+		fmt.Println("db is not nil in 3132132132132132")
+	}
 }

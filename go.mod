@@ -3,6 +3,9 @@ module web-app
 go 1.23.3
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dlclark/regexp2 v1.11.4
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-redis/redis/v8 v8.11.5
@@ -10,6 +13,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.29.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -48,11 +52,10 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

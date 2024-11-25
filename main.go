@@ -11,6 +11,9 @@ import (
 	"web-app/dao/mysql"
 	"web-app/dao/redis"
 	"web-app/logger"
+	"web-app/pkg/snowflake"
+
+	// "web-app/pkg/snowflake"
 	"web-app/routes"
 	"web-app/settings"
 
@@ -20,7 +23,6 @@ import (
 
 /*
 	通用的go语言web开发框架
-
 */
 
 func main() {
@@ -31,7 +33,7 @@ func main() {
 	}
 
 	// 2. 初始化日志
-	err = logger.Init(settings.Conf.LogConfig)
+	err = logger.Init(settings.Conf.LogConfig, settings.Conf.AppConfig.Mode)
 	if err != nil {
 		fmt.Printf("init logger error: %v\n", err)
 	}
@@ -44,8 +46,9 @@ func main() {
 		fmt.Printf("init mysql error: %v\n", err)
 		return
 	}
+
 	defer mysql.Close()
-	
+
 	// 4. 初始化Redis连接
 	err = redis.Init(settings.Conf.RedisConfig)
 	if err != nil {
@@ -53,6 +56,13 @@ func main() {
 		return
 	}
 	defer redis.Close()	
+
+	// 雪花算法
+	err = snowflake.Init(settings.Conf.StartTime, settings.Conf.AppConfig.MachineID)
+	if err != nil {
+		fmt.Printf("init snowflake error: %v\n", err)
+		return
+	}
 
 	// 5. 注册路由
 	server := routes.Register()
@@ -66,7 +76,7 @@ func main() {
 	go func()  {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			zap.L().Sugar().Fatalf("listen: %s\n", err)
-		}	
+		}
 	}()
 
 	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
@@ -87,4 +97,5 @@ func main() {
 		zap.L().Sugar().Fatal("Server Shutdown:", zap.Error(err))
 	}
 	zap.L().Info("Server exiting")
-}
+
+}	
