@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"strconv"
 	"web-app/logic"
 	"web-app/models"
 
@@ -24,7 +25,13 @@ func NewUserHandler() *UserHandler {
 	}
 }	
 
-
+/*
+{
+    "username":"123456@qq.com",
+    "password":"12345",
+    "confirm_password":"12345"
+}
+*/
 func (u *UserHandler)SignUpHandler(ctx *gin.Context) {
 	// 1. 获取参数和参数校验
 	var param models.ParamSignUp
@@ -89,6 +96,12 @@ func (u *UserHandler)SignUpHandler(ctx *gin.Context) {
 }
 
 
+/*
+{
+    "username":"123456@qq.com",
+    "password":"12345"
+}
+*/
 func (u *UserHandler)LoginHandler(ctx *gin.Context) {
 	// 1. 获取参数和参数校验
 	var param models.ParamLogin
@@ -111,18 +124,23 @@ func (u *UserHandler)LoginHandler(ctx *gin.Context) {
 
 	// 2. 业务处理--在logic层处理
 	
-	var token string
-	if token, err = logic.Login(&param); err != nil {
+	user, err := logic.Login(&param)
+	if err != nil {
 		zap.L().Error("logic.Login failed", zap.Error(err))
-		if errors.Is(err, logic.ErrorUserNameOrPassword) {
-			ResponseErrorWithMsg(ctx, CodeInvalidPassword, "用户名或密码错误")
+		if errors.Is(err, logic.ErrorServerBusy) {
+			ResponseError(ctx, CodeServerBusy)
 			return
 		}
-		ResponseError(ctx, CodeServerBusy)
+		ResponseErrorWithMsg(ctx, CodeInvalidPassword, "用户名或密码错误")
 		return
 	}
 
 	// 3. 返回响应
 	// ResponseSuccess(ctx, "登录成功了,这是登录成功的data")
-	ResponseSuccess(ctx, token)
+	ResponseSuccess(ctx, gin.H{
+		// int64-->string
+		"user_id": strconv.FormatInt(user.UserID, 10),
+		"user_name": user.UserName,
+		"token": user.Token,
+	})
 }

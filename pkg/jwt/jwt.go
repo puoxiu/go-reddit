@@ -25,6 +25,7 @@ func GenToken(userID int64, username string) (string, error) {
 		userID,
 		username,
 		jwt.StandardClaims{
+			// 过期时间
 			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(),
 			Issuer: "reddit",
 		},

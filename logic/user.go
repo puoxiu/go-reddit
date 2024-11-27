@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"errors"
+	"database/sql"
 	"web-app/dao/mysql"
 	"web-app/models"
 	"web-app/pkg/jwt"
@@ -11,22 +11,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var (
-	ErrorUserExist = errors.New("用户已经存在")
-	ErrorUserNameOrPassword = errors.New("用户名或者密码错误")
-	ErrorServerBusy = errors.New("服务繁忙")
-)
 
 
 func SignUp(param *models.ParamSignUp) error {	
 	// 保存进数据库->dao层
 	// 1. 判断用户是否存在
-	exit,err := mysql.CheckUserExistByName(param.UserName)
-	if err != nil {
-		return ErrorServerBusy
-	}
-	
-	if exit {
+	_,err := mysql.GetUserByByName(param.UserName)
+	if err == nil {
 		return ErrorUserExist
 	}
 
@@ -43,26 +34,27 @@ func SignUp(param *models.ParamSignUp) error {
 	return nil
 }
 
-
-func Login(param *models.ParamLogin) (string, error) {
-	user := &models.User{
-		UserName: param.UserName,
-		Password: param.Password,
-	}
-	err := mysql.CheckUser(user)
+// Login 登录
+func Login(param *models.ParamLogin) (user *models.User, err error) {
+	user, err = mysql.GetUserByByName(param.UserName)
 	if err != nil {
-		return "", ErrorServerBusy
+		if err == sql.ErrNoRows {
+			return nil, ErrorNoUser
+		}
+		zap.L().Error("mysql.GetUserByByName() failed", zap.Error(err))
+		return nil, ErrorServerBusy
 	}
 	// 判断密码是否正确
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(param.Password)); err != nil {
-		return "", ErrorUserNameOrPassword
+		return nil, ErrorUserNameOrPassword
 	}
 
 	// 生成JWT
 	var token string
 	if token, err = jwt.GenToken(user.UserID, user.UserName); err != nil {
 		zap.L().Error("GenToken failed", zap.Error(err))
-		return "", ErrorServerBusy
+		return nil, ErrorServerBusy
 	}
-	return token, nil
+	user.Token = token
+	return user, nil
 }

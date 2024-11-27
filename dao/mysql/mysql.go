@@ -13,7 +13,7 @@ var db *sqlx.DB
 
 func InitDB(cfg *settings.MySQLConfig) error {
 	// 初始化数据库
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,

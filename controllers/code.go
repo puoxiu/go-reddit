@@ -7,6 +7,7 @@ const (
 	CodeUserNotExist
 	CodeInvalidPassword
 	CodeServerBusy
+	CodeNoData
 	
 	CodeNoAuth
 	CodeInvalidToken
@@ -19,6 +20,7 @@ var codeMsgMap = map[int]string{
 	CodeUserNotExist:  "用户不存在",
 	CodeInvalidPassword: "用户名或密码错误",
 	CodeServerBusy:    "服务繁忙",
+	CodeNoData:        "无对应数据",
 	CodeNoAuth:        "无权限访问, 需要登录",
 	CodeInvalidToken:   "无效的Token",
 }
