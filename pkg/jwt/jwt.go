@@ -10,6 +10,7 @@ import (
 const (
 	TokenExpireDuration = time.Hour * 2
 	SecretKey = "xingxingisme"
+	JWTIssuer = "reddit"
 )
 
 type MyClaims struct {
@@ -19,7 +20,7 @@ type MyClaims struct {
 }
 
 // GenToken 生成JWT
-func GenToken(userID int64, username string) (string, error) {
+func GetToken(userID int64, username string) (string, error) {
 	// 创建一个我们自己的声明
 	c := MyClaims{
 		userID,
@@ -27,7 +28,7 @@ func GenToken(userID int64, username string) (string, error) {
 		jwt.StandardClaims{
 			// 过期时间
 			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(),
-			Issuer: "reddit",
+			Issuer: JWTIssuer,
 		},
 	}
 

@@ -77,3 +77,8 @@ redis: 存储: user_id --> token 进行验证
 * Sorted Set有序集合ZSet
 * Bitmap位图
 * 
+
+
+# swagger 生成接口文档
+* 安装： go get -u github.com/swaggo/swag/cmd/swag
+

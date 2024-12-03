@@ -51,7 +51,7 @@ func Login(param *models.ParamLogin) (user *models.User, err error) {
 
 	// 生成JWT
 	var token string
-	if token, err = jwt.GenToken(user.UserID, user.UserName); err != nil {
+	if token, err = jwt.GetToken(user.UserID, user.UserName); err != nil {
 		zap.L().Error("GenToken failed", zap.Error(err))
 		return nil, ErrorServerBusy
 	}

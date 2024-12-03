@@ -18,7 +18,7 @@ import (
 type ResponseData struct {
 	Code int `json:"code"`
 	Msg interface{} `json:"msg"`
-	Data interface{} `json:"data"`
+	Data interface{} `json:"data,omitempty"`	//omitempty表示如果data为空则不返回data字段
 }
 
 

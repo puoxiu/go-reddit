@@ -9,4 +9,6 @@ var (
 	ErrorUserNameOrPassword = errors.New("用户名或者密码错误")
 	ErrorServerBusy = errors.New("服务繁忙")
 	ErrorNoData = errors.New("没有数据")
+
+	ErrorVoteTimeExpire = errors.New("投票时间已过")
 )

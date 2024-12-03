@@ -111,6 +111,7 @@ func (u *UserHandler)LoginHandler(ctx *gin.Context) {
 		return	
 	}
 
+	//
 	ok, err := u.emailRegexExp.MatchString(param.UserName)
 	if err != nil {
 		zap.L().Error("emailRegexExp.MatchString failed", zap.Error(err))

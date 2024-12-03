@@ -3,6 +3,7 @@ package logic
 import (
 	"database/sql"
 	"web-app/dao/mysql"
+	"web-app/dao/redis"
 	"web-app/models"
 	"web-app/pkg/snowflake"
 
@@ -17,6 +18,9 @@ func CreatePost(p *models.Post) (err error) {
 		zap.L().Error("mysql.CreatePost(p) failed", zap.Error(err))
 		return ErrorServerBusy
 	}
+
+	err = redis.InsertPost(p.ID)
+
 	return
 }
 
@@ -53,6 +57,51 @@ func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
 	}
 	return
 }
+
+func GetPostListV2(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	ids, err := redis.GetPostIDsInOrder(p)
+	if err != nil {
+		zap.L().Error("redis.GetPostIDsInOrder() failed", zap.Error(err))
+		return nil, ErrorServerBusy
+	}
+
+	if len(ids) == 0 {
+		return
+	}
+
+	posts, err := mysql.GetPostListByIDs(ids)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrorNoData
+		}
+		zap.L().Error("mysql.GetPostListByIDs() failed", zap.Error(err))
+		return nil, ErrorServerBusy
+	}
+
+	data = make([]*models.ApiPostDetail, 0, len(posts))
+	for _, post := range posts {
+		// 查询作者信息
+		user, err := mysql.GetUserByID(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql.GetUserByID() failed", zap.Error(err))
+			continue
+		}
+		// 查询社区信息
+		community, err := mysql.GetCommunityDetailByID(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql.GetCommunityDetailByID() failed", zap.Error(err))
+			continue
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName: user.UserName,
+			Post:       post,
+			CommunityDetail:  community,
+		}
+		data = append(data, postDetail)
+	}
+	return
+}
+
 
 func GetPostDetailByID(id int64) (data *models.ApiPostDetail, err error) {
 	post, err := mysql.GetPostByID(id)
