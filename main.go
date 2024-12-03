@@ -81,9 +81,6 @@ func main() {
 
 	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal, 1)
-	// kill (no param) default send syscall.SIGTERM
-	// kill -2 is syscall.SIGINT
-	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)	// 捕获信号 此处不会阻塞
 	<-quit	// 阻塞在此处，当接收到信号时才会往下执行
 
