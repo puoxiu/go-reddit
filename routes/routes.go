@@ -13,7 +13,7 @@ import (
 func Register() (*gin.Engine){
 	server := gin.Default()
 	
-	server.Use(logger.GinLogger(), logger.GinRecovery(true))
+	server.Use(logger.GinLogger(), logger.GinRecovery(true))	// 日志中间件
 
 	fmt.Println("routes.Register()")
 
